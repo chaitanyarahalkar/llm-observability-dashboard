@@ -92,9 +92,17 @@ Query params: `since=24h`, `since=7d`, `interval=1h`, `page=1`, `limit=50`, `mod
 
 ## Screenshots
 
-![Dashboard Overview](docs/dashboard-full.png)
+### Dashboard Overview
 
-*Full dashboard showing stat cards, latency/cost/token charts, per-model breakdown, and trace table — all live against the Go + SQLite backend.*
+![Dashboard Overview](docs/dashboard-overview.png)
+
+*Stat cards, latency/cost/token charts, with the Observability sidebar — all live data from the Go + SQLite backend.*
+
+### Model Breakdown & Traces
+
+![Model Breakdown & Traces](docs/dashboard-traces.png)
+
+*Per-model breakdown table comparing gpt-4o, claude-sonnet-4, gpt-4o-mini, claude-haiku, llama-3-70b across requests, tokens, latency, cost, and error rate. Recent traces table with status badges and pagination.*
 
 ## Tech Stack
 

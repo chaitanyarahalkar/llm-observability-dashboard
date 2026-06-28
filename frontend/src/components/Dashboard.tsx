@@ -7,8 +7,12 @@ import ChartsGrid from './Charts'
 import TracesTable from './TracesTable'
 import ModelBreakdownTable from './ModelBreakdownTable'
 import { Button } from './ui/button'
-import { AlertTriangle, CheckCircle2, RefreshCw, ShieldCheck } from 'lucide-react'
+import {
+  AlertTriangle, RefreshCw,
+} from 'lucide-react'
+import { cn } from '../lib/utils'
 import EnterpriseInsights from './EnterpriseInsights'
+import { TooltipProvider } from './ui/tooltip'
 
 const RANGES = ['1h', '6h', '24h', '7d', '30d'] as const
 
@@ -50,72 +54,113 @@ export default function Dashboard() {
     return () => clearInterval(interval)
   }, [fetchData])
 
-  return (
-    <div className="flex h-screen overflow-hidden bg-background text-foreground">
-      <Sidebar />
+  const now = new Date()
 
-      <main className="relative flex-1 overflow-y-auto">
-        <div className="pointer-events-none fixed inset-0 bg-[radial-gradient(circle_at_top_right,rgba(80,110,255,0.16),transparent_32rem),radial-gradient(circle_at_20%_10%,rgba(16,185,129,0.08),transparent_28rem)]" />
-        <div className="relative mx-auto max-w-[1440px] space-y-6 p-4 sm:p-6 lg:p-8">
-          <header className="overflow-hidden rounded-2xl border border-border/70 bg-card/75 shadow-2xl shadow-black/20 backdrop-blur">
-            <div className="flex flex-col gap-6 p-6 lg:flex-row lg:items-center lg:justify-between">
-              <div className="max-w-3xl">
-                <div className="mb-4 flex flex-wrap items-center gap-2">
-                  <span className="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/10 px-3 py-1 text-xs font-medium text-primary">
-                    <ShieldCheck size={14} /> Production LLM Operations
-                  </span>
-                  <span className="inline-flex items-center gap-2 rounded-full border border-emerald-500/20 bg-emerald-500/10 px-3 py-1 text-xs text-emerald-300">
-                    <CheckCircle2 size={14} /> 30s auto-refresh
-                  </span>
+  return (
+    <TooltipProvider>
+      <div className="flex h-screen overflow-hidden bg-background text-foreground">
+        <Sidebar />
+
+        <main className="relative flex-1 overflow-y-auto">
+          {/* Subtle ambient background */}
+          <div className="pointer-events-none fixed inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(99,102,241,0.08),transparent_50%),radial-gradient(ellipse_at_bottom_left,rgba(16,185,129,0.04),transparent_50%)]" />
+
+          <div className="relative mx-auto max-w-[1440px] space-y-5 p-4 sm:p-6 lg:p-8">
+            {/* Header */}
+            <header className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+              <div className="space-y-1.5">
+                <div className="flex items-center gap-2.5 text-xs text-muted-foreground">
+                  <div className="flex items-center gap-1.5">
+                    <span className="relative flex h-1.5 w-1.5">
+                      <span className="absolute inline-flex h-full w-full rounded-full bg-success opacity-75 animate-pulse-ring" />
+                      <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-success" />
+                    </span>
+                    <span className="font-medium text-success/90">Live</span>
+                  </div>
+                  <span>·</span>
+                  <span>{now.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}</span>
+                  <span>·</span>
+                  <span>{now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}</span>
                 </div>
-                <h1 className="text-3xl font-semibold tracking-tight sm:text-4xl">Enterprise AI observability dashboard</h1>
-                <p className="mt-3 max-w-2xl text-sm leading-6 text-muted-foreground">
-                  Govern token usage, latency, costs, model reliability, and trace health from one executive-ready command center.
+                <h1 className="text-[1.65rem] font-bold tracking-tight text-foreground">
+                  LLM Observability
+                </h1>
+                <p className="text-[0.8125rem] text-muted-foreground max-w-xl">
+                  Real-time telemetry for production AI workloads — monitor token usage, latency, costs, and reliability across all models and providers.
                 </p>
               </div>
 
-              <div className="flex flex-col gap-3 rounded-xl border border-border/70 bg-background/40 p-3">
-                <div className="flex items-center rounded-lg border border-border bg-card p-1">
+              <div className="flex items-center gap-2 shrink-0">
+                {/* Time range selector */}
+                <div className="flex items-center rounded-lg border border-border/60 bg-card p-0.5">
                   {RANGES.map((r) => (
                     <button
                       key={r}
                       onClick={() => setTimeRange(r)}
-                      className={`rounded-md px-3 py-2 text-xs font-semibold transition-all ${
+                      className={cn(
+                        "relative rounded-[6px] px-3 py-1.5 text-[0.75rem] font-semibold transition-all duration-150",
                         timeRange === r
-                          ? 'bg-primary text-primary-foreground shadow-lg shadow-primary/20'
-                          : 'text-muted-foreground hover:bg-muted hover:text-foreground'
-                      }`}
+                          ? "bg-primary text-primary-foreground shadow-md shadow-primary/20"
+                          : "text-muted-foreground hover:text-foreground hover:bg-muted/40"
+                      )}
                     >
                       {r}
                     </button>
                   ))}
                 </div>
-                <div className="flex items-center justify-between gap-3">
-                  <span className="text-xs text-muted-foreground">
-                    {lastUpdated ? `Updated ${lastUpdated.toLocaleTimeString()}` : loading ? 'Loading telemetry…' : 'Not updated'}
+
+                {/* Refresh + last updated */}
+                <div className="flex items-center gap-2">
+                  <span className="hidden sm:inline text-[0.7rem] text-muted-foreground/70 tabular-nums">
+                    {lastUpdated
+                      ? `Updated ${lastUpdated.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}`
+                      : loading ? 'Loading…' : 'Not updated'}
                   </span>
-                  <Button variant="outline" size="sm" onClick={fetchData} disabled={refreshing}>
-                    <RefreshCw className={refreshing ? 'animate-spin' : ''} size={15} /> Refresh
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={fetchData}
+                    disabled={refreshing}
+                    className="h-8 gap-1.5 text-[0.75rem]"
+                  >
+                    <RefreshCw size={13} className={cn(refreshing && 'animate-spin')} />
+                    {refreshing ? 'Refreshing' : 'Refresh'}
                   </Button>
                 </div>
               </div>
-            </div>
-          </header>
+            </header>
 
-          {error && (
-            <div className="flex items-center gap-3 rounded-xl border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm text-destructive">
-              <AlertTriangle size={16} />
-              <span>{error}</span>
-            </div>
-          )}
+            {/* Error banner */}
+            {error && (
+              <div className="flex items-center gap-3 rounded-xl border border-destructive/30 bg-destructive/8 px-4 py-3 text-[0.8125rem] text-destructive">
+                <AlertTriangle size={15} />
+                <span>{error}</span>
+              </div>
+            )}
 
-          <EnterpriseInsights stats={overview} models={modelBreakdown} />
-          <StatCards stats={overview} />
-          <ChartsGrid data={timeSeries} />
-          <ModelBreakdownTable data={modelBreakdown} />
-          <TracesTable />
-        </div>
-      </main>
-    </div>
+            {/* Content */}
+            <EnterpriseInsights stats={overview} models={modelBreakdown} />
+            <StatCards stats={overview} loading={loading} />
+            <ChartsGrid data={timeSeries} />
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+              <ModelBreakdownTable data={modelBreakdown} />
+              <TracesTable />
+            </div>
+
+            {/* Footer */}
+            <footer className="flex items-center justify-between border-t border-border/40 pt-4 pb-6">
+              <div className="flex items-center gap-4 text-[0.7rem] text-muted-foreground/50">
+                <span>LLM Observability Platform</span>
+                <span className="opacity-30">·</span>
+                <span>v1.0.0</span>
+              </div>
+              <span className="text-[0.7rem] text-muted-foreground/50">
+                Auto-refreshing every 30s
+              </span>
+            </footer>
+          </div>
+        </main>
+      </div>
+    </TooltipProvider>
   )
 }

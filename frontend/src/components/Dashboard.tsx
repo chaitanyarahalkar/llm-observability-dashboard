@@ -1,10 +1,13 @@
 import { useState, useEffect, useCallback } from 'react'
 import { getOverview, getTimeSeries, getModelBreakdown } from '../api/client'
 import type { OverviewStats, TimeSeriesBucket, ModelBreakdown } from '../api/client'
+import Sidebar from './Sidebar'
 import StatCards from './StatCards'
 import ChartsGrid from './Charts'
 import TracesTable from './TracesTable'
-import { Activity, RefreshCw } from 'lucide-react'
+import ModelBreakdownTable from './ModelBreakdownTable'
+import { Button } from './ui/button'
+import { RefreshCw } from 'lucide-react'
 
 const RANGES = ['1h', '6h', '24h', '7d', '30d'] as const
 
@@ -36,92 +39,55 @@ export default function Dashboard() {
   }, [fetchData])
 
   return (
-    <div className="dashboard">
-      <header className="dashboard-header">
-        <div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-            <Activity size={24} color="var(--accent)" />
-            <h1>LLM Observability</h1>
-          </div>
-          <p className="subtitle">Monitor token usage, latency, costs, and errors across your AI workloads</p>
-        </div>
+    <div className="flex h-screen overflow-hidden bg-background">
+      <Sidebar />
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-          <div className="time-range-selector">
-            {RANGES.map((r) => (
-              <button
-                key={r}
-                className={timeRange === r ? 'active' : ''}
-                onClick={() => setTimeRange(r)}
-              >
-                {r}
-              </button>
-            ))}
-          </div>
-          <button
-            onClick={fetchData}
-            style={{
-              background: 'var(--bg-card)',
-              border: '1px solid var(--border)',
-              borderRadius: 8,
-              padding: '6px 10px',
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-            }}
-          >
-            <RefreshCw size={16} color="var(--text-secondary)" />
-          </button>
-        </div>
-      </header>
+      <main className="flex-1 overflow-y-auto">
+        <div className="max-w-[1280px] mx-auto p-6 space-y-5">
+          {/* Header */}
+          <header className="flex items-center justify-between">
+            <div>
+              <h1 className="text-lg font-semibold tracking-tight">Dashboard</h1>
+              <p className="text-xs text-muted-foreground mt-0.5">
+                Monitor token usage, latency, costs, and errors across your AI workloads
+              </p>
+            </div>
 
-      <StatCards stats={overview} />
-
-      <ChartsGrid data={timeSeries} />
-
-      {modelBreakdown.length > 0 && (
-        <div className="chart-card" style={{ marginBottom: '1.5rem' }}>
-          <h3>Per-Model Breakdown</h3>
-          <div style={{ overflowX: 'auto' }}>
-            <table className="traces-table">
-              <thead>
-                <tr>
-                  <th>Model</th>
-                  <th>Requests</th>
-                  <th>Tokens</th>
-                  <th>Avg Latency</th>
-                  <th>Cost</th>
-                  <th>Error Rate</th>
-                </tr>
-              </thead>
-              <tbody>
-                {modelBreakdown.map((m) => (
-                  <tr key={m.model}>
-                    <td><span className="model-badge">{m.model}</span></td>
-                    <td>{m.requests.toLocaleString()}</td>
-                    <td style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: '0.8rem' }}>
-                      {m.total_tokens.toLocaleString()}
-                    </td>
-                    <td style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: '0.8rem' }}>
-                      {m.avg_latency_ms >= 1000
-                        ? `${(m.avg_latency_ms / 1000).toFixed(1)}s`
-                        : `${Math.round(m.avg_latency_ms)}ms`}
-                    </td>
-                    <td className="cost-cell">${m.cost.toFixed(4)}</td>
-                    <td>
-                      <span className={`status-badge ${m.error_rate < 1 ? 'success' : 'error'}`}>
-                        {m.error_rate.toFixed(1)}%
-                      </span>
-                    </td>
-                  </tr>
+            <div className="flex items-center gap-2">
+              <div className="flex items-center rounded-lg border border-border bg-card p-0.5">
+                {RANGES.map((r) => (
+                  <button
+                    key={r}
+                    onClick={() => setTimeRange(r)}
+                    className={`px-3 py-1.5 text-xs font-medium rounded-md transition-colors ${
+                      timeRange === r
+                        ? 'bg-primary text-primary-foreground'
+                        : 'text-muted-foreground hover:text-foreground'
+                    }`}
+                  >
+                    {r}
+                  </button>
                 ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      )}
+              </div>
+              <Button variant="outline" size="icon" onClick={fetchData}>
+                <RefreshCw size={15} />
+              </Button>
+            </div>
+          </header>
 
-      <TracesTable />
+          {/* Stat Cards */}
+          <StatCards stats={overview} />
+
+          {/* Charts */}
+          <ChartsGrid data={timeSeries} />
+
+          {/* Model Breakdown */}
+          <ModelBreakdownTable data={modelBreakdown} />
+
+          {/* Traces Table */}
+          <TracesTable />
+        </div>
+      </main>
     </div>
   )
 }

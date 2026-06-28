@@ -90,6 +90,12 @@ Query params: `since=24h`, `since=7d`, `interval=1h`, `page=1`, `limit=50`, `mod
 - **Model breakdown**: Per-model aggregate stats table
 - **Dark theme** out of the box — clean, mature, readable
 
+## Screenshots
+
+![Dashboard Overview](docs/dashboard-full.png)
+
+*Full dashboard showing stat cards, latency/cost/token charts, per-model breakdown, and trace table — all live against the Go + SQLite backend.*
+
 ## Tech Stack
 
 | Layer | Technology |

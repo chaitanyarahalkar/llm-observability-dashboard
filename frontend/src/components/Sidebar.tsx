@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Activity, BarChart3, Table2, Zap, ChevronLeft, ChevronRight, Settings, Terminal } from 'lucide-react'
+import { Activity, BarChart3, Zap, ChevronLeft, ChevronRight, Settings, Terminal } from 'lucide-react'
 import { cn } from '../lib/utils'
 import { Button } from './ui/button'
 

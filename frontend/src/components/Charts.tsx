@@ -91,7 +91,7 @@ function CostChart({ data }: { data: TimeSeriesBucket[] }) {
         <Tooltip
           contentStyle={{ background: 'oklch(0.17 0.005 285)', border: '1px solid oklch(0.22 0.01 280)', borderRadius: 8, fontSize: 13 }}
           labelStyle={{ color: 'oklch(0.55 0.01 280)', marginBottom: 4 }}
-          formatter={(value: number) => [`$${value.toFixed(4)}`, 'Cost']}
+          formatter={(value) => [`$${Number(value ?? 0).toFixed(4)}`, 'Cost']}
         />
         <Area type="monotone" dataKey="cost" stroke="oklch(0.80 0.12 85)" strokeWidth={2} fill="url(#costGrad)" name="Cost ($)" />
       </AreaChart>

@@ -14,17 +14,17 @@ A clean, mature, self-hosted observability dashboard for monitoring LLM (Large L
 - **Per-model breakdown** — compare performance across different models and providers
 - **Error tracking** — error rate monitoring and failed request visibility
 
-## Architecture
+## Complete Architecture
 
 ```
-┌─────────────────┐     REST API      ┌──────────────┐
-│  Your AI App    │ ──── POST ────────▶│  Go Backend  │
-│  (instrumented) │    /api/v1/traces  │  :8080       │
-└─────────────────┘                     │  SQLite DB   │
-                                        └──────┬───────┘
-                                               │
-┌─────────────────┐                            │
-│  Dashboard UI   │ ◀──── GET /api/v1/stats ───┘
+┌─────────────────┐     REST API      ┌──────────────────┐
+│  Your AI App    │ ──── POST ────────▶│  Go Backend      │
+│  (instrumented) │    /api/v1/traces  │  :8090           │
+└─────────────────┘                     │  SQLite DB      │
+                                        └────────┬─────────┘
+                                                 │
+┌─────────────────┐                              │
+│  Dashboard UI   │ ◀──── GET /api/v1/stats ────┘
 │  React + Vite   │
 │  :5173          │
 └─────────────────┘
@@ -37,8 +37,8 @@ A clean, mature, self-hosted observability dashboard for monitoring LLM (Large L
 ```bash
 cd backend
 GONOSUMCHECK='*' GONOSUMDB='*' GOPROXY='https://proxy.golang.org,direct' go mod tidy
-go run ./cmd/server
-# API running on :8080
+PORT=8090 go run ./cmd/server
+# API running on :8090
 ```
 
 ### Frontend
@@ -53,7 +53,7 @@ npm run dev
 ### Ingest Sample Data
 
 ```bash
-curl -X POST http://localhost:8080/api/v1/traces \
+curl -X POST http://localhost:8090/api/v1/traces \
   -H 'Content-Type: application/json' \
   -d '[{
     "model": "gpt-4o",

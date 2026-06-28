@@ -83,12 +83,13 @@ Query params: `since=24h`, `since=7d`, `interval=1h`, `page=1`, `limit=50`, `mod
 
 ## Dashboard
 
-- **Stat cards**: Total requests, tokens, avg latency, cost, error rate, avg tokens/req, unique models, avg cost/req
-- **Area charts**: Latency, token usage, and cost over time
-- **Stacked area**: Prompt vs completion tokens
-- **Traces table**: Sortable, paginated trace list with model badges and status indicators
-- **Model breakdown**: Per-model aggregate stats table
-- **Dark theme** out of the box — clean, mature, readable
+- **Stat cards**: Total requests, tokens, avg latency, cost, error rate, prompt/completion split, active models, throughput — with loading skeletons and dynamic accent coloring by threshold
+- **Health & SLOs**: Reliability posture, P95 latency, provider coverage, top cost driver — tone-coded status rings
+- **Area charts**: Latency, token usage, cost, and prompt vs completion stacked area — consistent oklch palette
+- **Traces table**: Model search, status filter chips (All/Success/Error), skeleton loading, responsive columns, status dot indicators, pagination
+- **Model breakdown**: Sortable columns, cost mini-bar visualization, status-colored error rates
+- **Sidebar**: Branded header, live health pulse, navigation sections, user area, collapsible
+- **Enterprise dark theme**: Deep midnight-slate palette, Inter + JetBrains Mono fonts, shimmer animations
 
 ## Screenshots
 
